@@ -1,91 +1,93 @@
 # 部署指南
 
-将 AI Proxy 部署到 Cloudflare Workers 的详细步骤。
+将 AI Proxy 部署到 Cloudflare Pages 的详细步骤。
 
-## 步骤 1：准备工作
+## 方式一：连接 GitHub（推荐）
 
-### 1.1 注册 Cloudflare 账户
+这是最简单的方式，设置一次后自动部署。
 
-如果没有账户，访问 [Cloudflare 注册页面](https://dash.cloudflare.com/sign-up) 创建。
+### 步骤 1：准备 GitHub 仓库
 
-### 1.2 安装依赖
+将项目推送到 GitHub：
 
 ```bash
-cd /Users/devin/tools/workspace_front/ai-proxy
+# 如果还没有远程仓库
+git remote add origin https://github.com/YOUR_USERNAME/ai-proxy.git
+git push -u origin main
+```
+
+### 步骤 2：在 Cloudflare 创建 Pages 项目
+
+1. 登录 [Cloudflare Dashboard](https://dash.cloudflare.com)
+2. 进入 **Workers & Pages**
+3. 点击 **Create** → **Pages** → **Connect to Git**
+4. 授权并选择你的 `ai-proxy` 仓库
+
+### 步骤 3：配置构建设置
+
+| 设置项 | 值 |
+|--------|-----|
+| Production branch | `main` |
+| Build command | _(留空)_ |
+| Build output directory | `public` |
+
+### 步骤 4：部署
+
+点击 **Save and Deploy**，等待部署完成。
+
+部署成功后，你会得到一个 URL，如：
+- `https://ai-proxy.pages.dev`
+- 或 `https://ai-proxy-xxx.pages.dev`
+
+### 之后的更新
+
+只需推送代码到 `main` 分支，Cloudflare 会自动重新部署：
+
+```bash
+git add .
+git commit -m "Update"
+git push
+```
+
+---
+
+## 方式二：命令行部署
+
+如果不想连接 GitHub，可以直接用命令行部署。
+
+### 步骤 1：安装依赖
+
+```bash
 npm install
 ```
 
-## 步骤 2：登录 Cloudflare
+### 步骤 2：登录 Cloudflare
 
 ```bash
 npx wrangler login
 ```
 
-这会打开浏览器让你授权 Wrangler 访问你的 Cloudflare 账户。
-
-## 步骤 3：部署
+### 步骤 3：部署
 
 ```bash
-npm run deploy
+npx wrangler pages deploy public --project-name ai-proxy
 ```
 
-成功后输出类似：
+---
 
-```
-Uploaded ai-proxy (1.23 sec)
-Published ai-proxy (0.45 sec)
-  https://ai-proxy.your-subdomain.workers.dev
-```
+## 绑定自定义域名
 
-## 步骤 4：验证部署
+1. 在 Cloudflare Dashboard 进入你的 Pages 项目
+2. 点击 **Custom domains** → **Set up a custom domain**
+3. 输入你的域名（如 `api.yourdomain.com`）
+4. 按照提示配置 DNS
 
-访问你的 Worker URL（如 `https://ai-proxy.xxx.workers.dev`），应看到验证界面。
-
-## 可选配置
-
-### 绑定自定义域名
-
-1. 在 Cloudflare Dashboard 中添加你的域名
-2. 编辑 `wrangler.toml`：
-
-```toml
-routes = [
-  { pattern = "api.yourdomain.com/*", zone_name = "yourdomain.com" }
-]
-```
-
-3. 重新部署：
-
-```bash
-npm run deploy
-```
-
-### 环境变量
-
-如需配置环境变量，可通过 Dashboard 或 wrangler：
-
-```bash
-npx wrangler secret put MY_SECRET
-```
+---
 
 ## 常用命令
 
 | 命令 | 说明 |
 |------|------|
-| `npm run dev` | 本地开发 |
-| `npm run deploy` | 部署到生产 |
-| `npx wrangler tail` | 查看实时日志 |
-| `npx wrangler delete` | 删除 Worker |
-
-## 故障排除
-
-### 部署失败
-
-1. 确保已登录：`npx wrangler whoami`
-2. 检查 `wrangler.toml` 配置是否正确
-
-### API 调用失败
-
-1. 检查 API Key 是否正确
-2. 使用验证界面测试连接
-3. 查看日志：`npx wrangler tail`
+| `npx wrangler pages dev public` | 本地开发 |
+| `npx wrangler pages deploy public` | 部署到生产 |
+| `npx wrangler pages project list` | 列出所有项目 |

@@ -1,6 +1,6 @@
 # AI Proxy
 
-一个部署在 Cloudflare Workers 上的 AI API 代理，支持 OpenAI、Claude 和 Gemini。
+一个部署在 Cloudflare Pages 上的 AI API 代理，支持 OpenAI、Claude 和 Gemini。
 
 ## 功能特性
 
@@ -8,38 +8,41 @@
 - 🔒 **透明代理** - 完整转发请求，支持所有模型
 - 🌐 **CORS 支持** - 可从任意前端调用
 - 🎨 **验证界面** - 内置美观的测试页面
+- 🔗 **GitHub 集成** - 直接连接 GitHub，推送即部署
 
-## 快速开始
+## 项目结构
 
-### 前置要求
+```
+ai-proxy/
+├── public/
+│   └── index.html          # 验证界面（静态页面）
+├── functions/
+│   ├── openai/[[path]].js  # OpenAI 代理
+│   ├── claude/[[path]].js  # Claude 代理
+│   └── gemini/[[path]].js  # Gemini 代理
+└── package.json
+```
 
-- Node.js 18+
-- [Cloudflare 账户](https://dash.cloudflare.com/sign-up)
-- Wrangler CLI（随项目安装）
+## 快速部署
 
-### 本地开发
+### 方式一：直接连接 GitHub（推荐）
+
+1. Fork 或推送此仓库到 GitHub
+2. 登录 [Cloudflare Dashboard](https://dash.cloudflare.com)
+3. 进入 **Workers & Pages** → **Create** → **Pages** → **Connect to Git**
+4. 选择你的仓库，配置：
+   - **Build command**: 留空
+   - **Build output directory**: `public`
+5. 点击 **Save and Deploy**
+
+之后每次推送到 `main` 分支，Cloudflare 会自动部署！
+
+### 方式二：本地部署
 
 ```bash
-# 安装依赖
 npm install
-
-# 启动本地开发服务器
-npm run dev
-
-# 访问 http://localhost:8787
+npx wrangler pages deploy public --project-name ai-proxy
 ```
-
-### 部署到 Cloudflare
-
-```bash
-# 首次部署需要登录
-npx wrangler login
-
-# 部署
-npm run deploy
-```
-
-部署成功后会得到一个 URL，如：`https://ai-proxy.your-subdomain.workers.dev`
 
 ## API 端点
 
@@ -54,7 +57,7 @@ npm run deploy
 ### OpenAI
 
 ```bash
-curl -X POST https://your-worker.workers.dev/openai/v1/chat/completions \
+curl -X POST https://your-project.pages.dev/openai/v1/chat/completions \
   -H "Authorization: Bearer sk-xxx" \
   -H "Content-Type: application/json" \
   -d '{
@@ -66,7 +69,7 @@ curl -X POST https://your-worker.workers.dev/openai/v1/chat/completions \
 ### Claude
 
 ```bash
-curl -X POST https://your-worker.workers.dev/claude/v1/messages \
+curl -X POST https://your-project.pages.dev/claude/v1/messages \
   -H "x-api-key: sk-ant-xxx" \
   -H "anthropic-version: 2023-06-01" \
   -H "Content-Type: application/json" \
@@ -80,21 +83,11 @@ curl -X POST https://your-worker.workers.dev/claude/v1/messages \
 ### Gemini
 
 ```bash
-curl -X POST "https://your-worker.workers.dev/gemini/v1beta/models/gemini-2.0-flash-exp:generateContent?key=xxx" \
+curl -X POST "https://your-project.pages.dev/gemini/v1beta/models/gemini-2.0-flash-exp:generateContent?key=xxx" \
   -H "Content-Type: application/json" \
   -d '{
     "contents": [{"parts": [{"text": "Hello"}]}]
   }'
-```
-
-## 自定义域名（可选）
-
-编辑 `wrangler.toml`：
-
-```toml
-routes = [
-  { pattern = "api.yourdomain.com/*", zone_name = "yourdomain.com" }
-]
 ```
 
 ## License
