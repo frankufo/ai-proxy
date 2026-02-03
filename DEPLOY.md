@@ -66,10 +66,6 @@ npm run dev
 
 ## 常见问题
 
-### Q: 为什么不需要 API Token？
-
-使用 **Connect to Git** 方式时，Cloudflare 通过 GitHub OAuth 授权直接访问你的仓库，不需要单独的 API Token。
-
 ### Q: functions 目录的代码怎么生效？
 
 Cloudflare Pages 会自动识别 `functions/` 目录下的 JS 文件作为 Pages Functions（类似于 Workers），无需额外配置。
