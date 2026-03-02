@@ -1,10 +1,10 @@
 # AI Proxy
 
-一个部署在 Cloudflare Pages 上的 AI API 代理，支持 OpenAI、Claude 和 Gemini。
+一个部署在 Cloudflare Pages 上的 AI API 代理，支持 OpenAI、Claude、Gemini 和 Telegram。
 
 ## 功能特性
 
-- 🚀 **多平台支持** - 同时代理 OpenAI、Claude、Gemini API
+- 🚀 **多平台支持** - 同时代理 OpenAI、Claude、Gemini 和 Telegram API
 - 🔒 **透明代理** - 完整转发请求，支持所有模型
 - 🌐 **CORS 支持** - 可从任意前端调用
 - 🎨 **验证界面** - 内置美观的测试页面
@@ -19,7 +19,8 @@ ai-proxy/
 └── functions/
     ├── openai/[[path]].js  # OpenAI 代理
     ├── claude/[[path]].js  # Claude 代理
-    └── gemini/[[path]].js  # Gemini 代理
+    ├── gemini/[[path]].js  # Gemini 代理
+    └── tg/[[path]].js      # Telegram 代理
 ```
 
 ## 快速部署
@@ -53,6 +54,7 @@ ai-proxy/
 | OpenAI | `/openai/*` | `/openai/v1/chat/completions` |
 | Claude | `/claude/*` | `/claude/v1/messages` |
 | Gemini | `/gemini/*` | `/gemini/v1beta/models/gemini-pro:generateContent` |
+| Telegram | `/tg/*` | `/tg/bot.../sendMessage` |
 
 ## 使用示例
 
@@ -78,6 +80,13 @@ curl -X POST https://your-project.pages.dev/claude/v1/messages \
 curl -X POST "https://your-project.pages.dev/gemini/v1beta/models/gemini-pro:generateContent?key=xxx" \
   -H "Content-Type: application/json" \
   -d '{"contents": [{"parts": [{"text": "Hello"}]}]}'
+```
+
+### Telegram
+```bash
+curl -X POST "https://your-project.pages.dev/tg/bot<YOUR_BOT_TOKEN>/sendMessage" \
+  -H "Content-Type: application/json" \
+  -d '{"chat_id": "-1003635213662", "text": "Hello"}'
 ```
 
 ## License

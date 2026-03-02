@@ -91,7 +91,7 @@
 
     .provider-select {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 12px;
       margin-bottom: 20px;
     }
@@ -132,6 +132,11 @@
     .provider-btn.gemini.active {
       border-color: #4285f4;
       background: rgba(66, 133, 244, 0.2);
+    }
+
+    .provider-btn.tg.active {
+      border-color: #0088cc;
+      background: rgba(0, 136, 204, 0.2);
     }
 
     .send-btn {
@@ -268,7 +273,7 @@
 <body>
   <div class="container">
     <h1>🚀 AI Proxy</h1>
-    <p class="subtitle">OpenAI / Claude / Gemini API 代理验证工具</p>
+    <p class="subtitle">OpenAI / Claude / Gemini / Telegram API 代理验证工具</p>
 
     <div class="info-panel">
       <h3>📝 使用说明</h3>
@@ -290,6 +295,9 @@
           </button>
           <button type="button" class="provider-btn gemini" data-provider="gemini">
             ✨ Gemini
+          </button>
+          <button type="button" class="provider-btn tg" data-provider="tg">
+            📱 Telegram
           </button>
         </div>
       </div>
@@ -393,6 +401,26 @@
           }
           return JSON.stringify(data, null, 2);
         }
+      },
+      tg: {
+        endpoint: '/tg/{apiKey}/sendMessage',
+        models: '输入 chat_id',
+        defaultModel: '-1003635213662',
+        buildRequest: (apiKey, model, message) => ({
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            chat_id: model || '-1003635213662',
+            text: message
+          })
+        }),
+        extractResponse: (data) => {
+          if (data.ok) {
+            return '✅ 发送成功\n' + JSON.stringify(data.result, null, 2);
+          }
+          return '❌ 发送失败\n' + JSON.stringify(data, null, 2);
+        }
       }
     };
 
@@ -410,6 +438,20 @@
 
     function updateUI() {
       const provider = providers[currentProvider];
+      const apiKeyInput = document.getElementById('apiKey');
+      const modelLabel = document.querySelector('label[for="model"]');
+      const apiKeyLabel = document.querySelector('label[for="apiKey"]');
+
+      if (currentProvider === 'tg') {
+        apiKeyLabel.textContent = 'Bot Token';
+        apiKeyInput.placeholder = '例如: bot8760923126:AAEbnzGL...';
+        modelLabel.innerHTML = 'Chat ID <span class="model-info" id="modelHint"></span>';
+      } else {
+        apiKeyLabel.textContent = 'API Key';
+        apiKeyInput.placeholder = '请输入您的 API Key';
+        modelLabel.innerHTML = '模型 <span class="model-info" id="modelHint"></span>';
+      }
+
       document.getElementById('modelHint').textContent = `(${provider.models})`;
       document.getElementById('model').value = provider.defaultModel;
       document.getElementById('model').placeholder = provider.defaultModel;
@@ -417,6 +459,8 @@
       let endpoint = provider.endpoint;
       if (currentProvider === 'gemini') {
         endpoint = endpoint.replace('{model}', provider.defaultModel);
+      } else if (currentProvider === 'tg') {
+        endpoint = endpoint.replace('{apiKey}', 'bot<token>');
       }
 
       // 获取当前域名并拼接完整 URL
@@ -461,6 +505,8 @@
         let endpoint = provider.endpoint;
         if (currentProvider === 'gemini') {
           endpoint = endpoint.replace('{model}', model) + requestConfig.endpointSuffix;
+        } else if (currentProvider === 'tg') {
+          endpoint = endpoint.replace('{apiKey}', apiKey);
         }
 
         const startTime = Date.now();
