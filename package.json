@@ -1,0 +1,23 @@
+{
+  "name": "ai-proxy",
+  "version": "1.0.0",
+  "description": "Cloudflare Pages proxy for OpenAI, Claude, and Gemini APIs",
+  "keywords": [
+    "cloudflare",
+    "pages",
+    "proxy",
+    "openai",
+    "claude",
+    "gemini",
+    "ai"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  },
+  "scripts": {
+    "dev": "wrangler pages dev public",
+    "deploy": "wrangler pages deploy public --project-name ai-proxy"
+  }
+}
