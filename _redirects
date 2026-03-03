@@ -1,5 +1,2 @@
-/openai/* /openai/:splat 200
-/claude/* /claude/:splat 200
-/gemini/* /gemini/:splat 200
-/tg/* /tg/:splat 200
-/* /index.html 200
+/index.html /index.html 200
+/ /index.html 200
