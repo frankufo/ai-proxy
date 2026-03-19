@@ -139,6 +139,11 @@
       background: rgba(0, 136, 204, 0.2);
     }
 
+    .provider-btn.openrouter.active {
+      border-color: #88ea11;
+      background: rgba(83, 237, 134, 0.2);
+    }
+
     .send-btn {
       width: 100%;
       padding: 16px;
@@ -299,6 +304,9 @@
           <button type="button" class="provider-btn tg" data-provider="tg">
             📱 Telegram
           </button>
+          <button type="button" class="provider-btn openrouter" data-provider="openrouter">
+            🌐 Openrouter
+          </button>
         </div>
       </div>
 
@@ -420,6 +428,30 @@
             return '✅ 发送成功\n' + JSON.stringify(data.result, null, 2);
           }
           return '❌ 发送失败\n' + JSON.stringify(data, null, 2);
+        }
+      },
+      openrouter: {
+        endpoint: '/openrouter/chat/completions',
+        models: 'nvidia/nemotron-3-super-120b-a12b:free',
+        defaultModel: 'nvidia/nemotron-3-super-120b-a12b:free',
+        buildRequest: (apiKey, model, message) => ({
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`
+          },
+          body: JSON.stringify({
+            model: model,
+            messages: [
+              { role: 'user', content: message }
+            ],
+            max_tokens: 512
+          })
+        }),
+        extractResponse: (data) => {
+          if (data.choices && data.choices[0]) {
+            return data.choices[0].message.content;
+          }
+          return JSON.stringify(data, null, 2);
         }
       }
     };
